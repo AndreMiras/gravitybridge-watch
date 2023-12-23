@@ -33,4 +33,12 @@ const getLastObservedEthNonce = (client: any) =>
 const lastValsetRequests = (client: any) =>
   promisify(client.LastValsetRequests).bind(client);
 
-export { getClient, getLastObservedEthNonce, lastValsetRequests };
+const getDelegateKeyByEth = (client: any) =>
+  promisify(client.GetDelegateKeyByEth).bind(client);
+
+export {
+  getClient,
+  getLastObservedEthNonce,
+  lastValsetRequests,
+  getDelegateKeyByEth,
+};

@@ -2,17 +2,14 @@ import {
   getClient,
   getLastObservedEthNonce,
   lastValsetRequests,
+  getDelegateKeyByEth,
 } from "../lib/grpc";
-
-const getRpcClient = () => getClient(process.env.GRPC_SERVER!);
+import { getRpcClient, getEthValoperMap } from "../lib/utils";
 
 const Home = async () => {
   const client = getRpcClient();
   const { nonce } = await getLastObservedEthNonce(client)({});
-  const lastValset = await lastValsetRequests(client)({});
-  const validatorEthAddresses = lastValset.valsets[0].members.map(
-    ({ ethereum_address: ethAddr }: { ethereum_address: string }) => ethAddr,
-  );
+  const ethValoperMap = await getEthValoperMap();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -20,14 +17,13 @@ const Home = async () => {
           Gravity Bridge Watcher
         </div>
       </div>
-
       <div>
         <p>Last Observed Eth Nonce: {nonce}</p>
         <div>
           Last Validator Set:
-          <ul>
-            {validatorEthAddresses.map((address: string) => (
-              <li key={address}>{address}</li>
+          <ul className="font-mono">
+            {Object.entries(ethValoperMap).map(([ethAddress, valoper]) => (
+              <li key={valoper}>{valoper}</li>
             ))}
           </ul>
         </div>
