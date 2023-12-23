@@ -27,6 +27,9 @@ const getClient = (url: string) => {
   return client;
 };
 
+const lastEventNonceByAddr = (client: any) =>
+  promisify(client.LastEventNonceByAddr).bind(client);
+
 const getLastObservedEthNonce = (client: any) =>
   promisify(client.GetLastObservedEthNonce).bind(client);
 
@@ -38,6 +41,7 @@ const getDelegateKeyByEth = (client: any) =>
 
 export {
   getClient,
+  lastEventNonceByAddr,
   getLastObservedEthNonce,
   lastValsetRequests,
   getDelegateKeyByEth,

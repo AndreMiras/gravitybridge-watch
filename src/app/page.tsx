@@ -2,14 +2,13 @@ import {
   getClient,
   getLastObservedEthNonce,
   lastValsetRequests,
-  getDelegateKeyByEth,
 } from "../lib/grpc";
-import { getRpcClient, getEthValoperMap } from "../lib/utils";
+import { getRpcClient, getValoperNonceMap } from "../lib/utils";
 
 const Home = async () => {
   const client = getRpcClient();
   const { nonce } = await getLastObservedEthNonce(client)({});
-  const ethValoperMap = await getEthValoperMap();
+  const valoperNonceMap = await getValoperNonceMap();
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -20,10 +19,12 @@ const Home = async () => {
       <div>
         <p>Last Observed Eth Nonce: {nonce}</p>
         <div>
-          Last Validator Set:
+          Valoper: orchestrator nonce:
           <ul className="font-mono">
-            {Object.entries(ethValoperMap).map(([ethAddress, valoper]) => (
-              <li key={valoper}>{valoper}</li>
+            {Object.entries(valoperNonceMap).map(([valoper, nonce]) => (
+              <li key={valoper}>
+                {valoper}: {nonce}
+              </li>
             ))}
           </ul>
         </div>

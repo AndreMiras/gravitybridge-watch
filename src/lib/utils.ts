@@ -1,25 +1,45 @@
 import { unstable_cache as cache } from "next/cache";
 import {
   getClient,
-  getLastObservedEthNonce,
+  lastEventNonceByAddr,
   lastValsetRequests,
   getDelegateKeyByEth,
 } from "./grpc";
 
 interface EthValoperMap {
-  [ethAddress: string]: string;
+  [ethAddress: string]: {
+    validatorAddress: string;
+    orchestratorAddress: string;
+  };
 }
+
+interface ValoperNonceMap {
+  [valoperAddress: string]: number;
+}
+
+const revalidateSecond = 10 * 60;
 
 const getRpcClient = () => getClient(process.env.GRPC_SERVER!);
 
-const getDelegateKeyByEthClientCached = cache(
-  async (ethAddress: string) => {
-    const client = getRpcClient();
-    const getDelegateKeyByEthClient = getDelegateKeyByEth(client);
-    return getDelegateKeyByEthClient({ eth_address: ethAddress });
-  },
+const lastEventNonceByAddrClient = (orchestratorAddress: string) =>
+  lastEventNonceByAddr(getRpcClient())({ address: orchestratorAddress });
+
+const lastEventNonceByAddrClientCached = cache(
+  async (orchestratorAddress: string) =>
+    lastEventNonceByAddrClient(orchestratorAddress),
   undefined,
-  { revalidate: 10 * 60 },
+  { revalidate: revalidateSecond },
+);
+
+const getDelegateKeyByEthClient = (ethAddress: string) =>
+  getDelegateKeyByEth(getRpcClient())({
+    eth_address: ethAddress,
+  });
+
+const getDelegateKeyByEthClientCached = cache(
+  async (ethAddress: string) => getDelegateKeyByEthClient(ethAddress),
+  undefined,
+  { revalidate: revalidateSecond },
 );
 
 const getEthValoperMapFromEth = async (
@@ -30,7 +50,10 @@ const getEthValoperMapFromEth = async (
     async (accPromise, ethAddress) => {
       const acc = await accPromise;
       const delegateKey = await getDelegateKeyByEthClientCached(ethAddress);
-      acc[ethAddress] = delegateKey.validator_address as string; // Ensure this is always a string.
+      acc[ethAddress] = {
+        validatorAddress: delegateKey.validator_address,
+        orchestratorAddress: delegateKey.orchestrator_address,
+      };
       return acc;
     },
     Promise.resolve({} as EthValoperMap),
@@ -38,7 +61,7 @@ const getEthValoperMapFromEth = async (
   return ethValoperMap;
 };
 
-const getEthValoperMap = async () => {
+const getEthValoperMap = async (): Promise<EthValoperMap> => {
   const client = getRpcClient();
   const lastValset = await lastValsetRequests(client)({});
   const validatorEthAddresses = lastValset.valsets[0].members.map(
@@ -47,4 +70,19 @@ const getEthValoperMap = async () => {
   return getEthValoperMapFromEth(validatorEthAddresses);
 };
 
-export { getRpcClient, getEthValoperMap };
+const getValoperNonceMap = async (): Promise<ValoperNonceMap> => {
+  const client = getRpcClient();
+  const ethValoperMap = await getEthValoperMap();
+  const valoperNonceMap = await Promise.all(
+    Object.entries(ethValoperMap).map(async ([ethAddress, valoperAddress]) => ({
+      [valoperAddress.validatorAddress]: (
+        await lastEventNonceByAddrClientCached(
+          valoperAddress.orchestratorAddress,
+        )
+      ).event_nonce,
+    })),
+  );
+  return Object.assign({}, ...valoperNonceMap);
+};
+
+export { getRpcClient, getEthValoperMap, getValoperNonceMap };
