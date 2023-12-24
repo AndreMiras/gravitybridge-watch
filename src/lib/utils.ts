@@ -1,4 +1,3 @@
-import { unstable_cache as cache } from "next/cache";
 import {
   getClient,
   lastEventNonceByAddr,
@@ -24,23 +23,10 @@ const getRpcClient = () => getClient(process.env.GRPC_SERVER!);
 const lastEventNonceByAddrClient = (orchestratorAddress: string) =>
   lastEventNonceByAddr(getRpcClient())({ address: orchestratorAddress });
 
-const lastEventNonceByAddrClientCached = cache(
-  async (orchestratorAddress: string) =>
-    lastEventNonceByAddrClient(orchestratorAddress),
-  undefined,
-  { revalidate: revalidateSecond },
-);
-
 const getDelegateKeyByEthClient = (ethAddress: string) =>
   getDelegateKeyByEth(getRpcClient())({
     eth_address: ethAddress,
   });
-
-const getDelegateKeyByEthClientCached = cache(
-  async (ethAddress: string) => getDelegateKeyByEthClient(ethAddress),
-  undefined,
-  { revalidate: revalidateSecond },
-);
 
 const getEthValoperMapFromEth = async (
   validatorEthAddresses: string[],
@@ -49,7 +35,7 @@ const getEthValoperMapFromEth = async (
   const ethValoperMap = await validatorEthAddresses.reduce(
     async (accPromise, ethAddress) => {
       const acc = await accPromise;
-      const delegateKey = await getDelegateKeyByEthClientCached(ethAddress);
+      const delegateKey = await getDelegateKeyByEthClient(ethAddress);
       acc[ethAddress] = {
         validatorAddress: delegateKey.validator_address,
         orchestratorAddress: delegateKey.orchestrator_address,
@@ -76,13 +62,12 @@ const getValoperNonceMap = async (): Promise<ValoperNonceMap> => {
   const valoperNonceMap = await Promise.all(
     Object.entries(ethValoperMap).map(async ([ethAddress, valoperAddress]) => ({
       [valoperAddress.validatorAddress]: (
-        await lastEventNonceByAddrClientCached(
-          valoperAddress.orchestratorAddress,
-        )
+        await lastEventNonceByAddrClient(valoperAddress.orchestratorAddress)
       ).event_nonce,
     })),
   );
   return Object.assign({}, ...valoperNonceMap);
 };
 
+export type { ValoperNonceMap };
 export { getRpcClient, getEthValoperMap, getValoperNonceMap };
