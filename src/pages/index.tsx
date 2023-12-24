@@ -1,17 +1,11 @@
 import {
-  getClient,
-  getLastObservedEthNonce,
-  lastValsetRequests,
-} from "../lib/grpc";
-import {
   ValoperNonceMap,
-  getRpcClient,
+  getLastObservedEthNonceClient,
   getValoperNonceMap,
 } from "../lib/utils";
 
 export const getStaticProps = async () => {
-  const client = getRpcClient();
-  const { nonce } = await getLastObservedEthNonce(client)({});
+  const nonce = await getLastObservedEthNonceClient({});
   const valoperNonceMap = await getValoperNonceMap();
   return {
     props: {
@@ -26,7 +20,7 @@ const Home = ({
   nonce,
   valoperNonceMap,
 }: {
-  nonce: string;
+  nonce: number;
   valoperNonceMap: ValoperNonceMap;
 }) => (
   <main className="flex min-h-screen flex-col items-center justify-between p-24">

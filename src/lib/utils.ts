@@ -1,6 +1,7 @@
 import {
   getClient,
   lastEventNonceByAddr,
+  getLastObservedEthNonce,
   lastValsetRequests,
   getDelegateKeyByEth,
 } from "./grpc";
@@ -22,6 +23,13 @@ const getRpcClient = () => getClient(process.env.GRPC_SERVER!);
 
 const lastEventNonceByAddrClient = (orchestratorAddress: string) =>
   lastEventNonceByAddr(getRpcClient())({ address: orchestratorAddress });
+
+const getLastObservedEthNonceClient = async (client: any) => {
+  const { nonce: nonceString } = await getLastObservedEthNonce(getRpcClient())(
+    {},
+  );
+  return Number(nonceString);
+};
 
 const getDelegateKeyByEthClient = (ethAddress: string) =>
   getDelegateKeyByEth(getRpcClient())({
@@ -70,4 +78,9 @@ const getValoperNonceMap = async (): Promise<ValoperNonceMap> => {
 };
 
 export type { ValoperNonceMap };
-export { getRpcClient, getEthValoperMap, getValoperNonceMap };
+export {
+  getRpcClient,
+  getLastObservedEthNonceClient,
+  getEthValoperMap,
+  getValoperNonceMap,
+};
