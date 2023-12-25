@@ -40,19 +40,17 @@ const getEthValoperMapFromEth = async (
   validatorEthAddresses: string[],
 ): Promise<EthValoperMap> => {
   const client = getRpcClient();
-  const ethValoperMap = await validatorEthAddresses.reduce(
-    async (accPromise, ethAddress) => {
-      const acc = await accPromise;
-      const delegateKey = await getDelegateKeyByEthClient(ethAddress);
-      acc[ethAddress] = {
+  const promises = validatorEthAddresses.map(async (ethAddress) => {
+    const delegateKey = await getDelegateKeyByEthClient(ethAddress);
+    return {
+      [ethAddress]: {
         validatorAddress: delegateKey.validator_address,
         orchestratorAddress: delegateKey.orchestrator_address,
-      };
-      return acc;
-    },
-    Promise.resolve({} as EthValoperMap),
-  );
-  return ethValoperMap;
+      },
+    };
+  });
+  const results = await Promise.all(promises);
+  return Object.assign({}, ...results);
 };
 
 const getEthValoperMap = async (): Promise<EthValoperMap> => {
