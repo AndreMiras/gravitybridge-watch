@@ -7,12 +7,13 @@
     "dev:debug": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
-    "lint:prettier": "prettier --check src *.md",
-    "format:prettier": "prettier --write src *.md",
+    "lint:prettier": "prettier --check src .github *.md",
+    "format:prettier": "prettier --write src .github *.md",
     "lint": "next lint && npm run lint:prettier",
     "format": "npm run format:prettier"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.7.0",
     "@grpc/grpc-js": "^1.9.13",
     "@protobufs/osmosis": "^0.4.0",
     "next": "14.0.4",

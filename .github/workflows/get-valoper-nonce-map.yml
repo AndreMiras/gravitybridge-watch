@@ -1,0 +1,14 @@
+# Force update the valoper nonce map cache so that Vercel ISR never gets a cache miss
+name: get-valoper-nonce-map
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/8 * * * *"
+
+jobs:
+  call_api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API Endpoint
+        run: curl --verbose "${{ vars.SERVER_URL }}/api/get-valoper-nonce-map?forceUpdate=true"

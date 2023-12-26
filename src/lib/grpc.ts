@@ -7,6 +7,27 @@ const gravityQueryProto = "gravity/v1/query.proto";
 const gravityProtoDir = "./src/proto";
 const osmosisProtoDir = "./node_modules/@protobufs/";
 
+interface Member {
+  power: string;
+  ethereum_address: string;
+}
+
+interface Valset {
+  members: Member[];
+  nonce: string;
+  height: string;
+  reward_amount: string;
+  reward_token: string;
+}
+
+interface LastValsetRequestsResponse {
+  valsets: Valset[];
+}
+
+interface lastEventNonceByAddrResponse {
+  event_nonce: string;
+}
+
 const options = {
   keepCase: true,
   longs: String,
@@ -27,18 +48,23 @@ const getClient = (url: string) => {
   return client;
 };
 
-const lastEventNonceByAddr = (client: any) =>
+const lastEventNonceByAddr = (
+  client: any,
+): ((params: { address: string }) => Promise<lastEventNonceByAddrResponse>) =>
   promisify(client.LastEventNonceByAddr).bind(client);
 
 const getLastObservedEthNonce = (client: any) =>
   promisify(client.GetLastObservedEthNonce).bind(client);
 
-const lastValsetRequests = (client: any) =>
+const lastValsetRequests = (
+  client: any,
+): ((params: {}) => Promise<LastValsetRequestsResponse>) =>
   promisify(client.LastValsetRequests).bind(client);
 
 const getDelegateKeyByEth = (client: any) =>
   promisify(client.GetDelegateKeyByEth).bind(client);
 
+export type { LastValsetRequestsResponse, lastEventNonceByAddrResponse };
 export {
   getClient,
   lastEventNonceByAddr,

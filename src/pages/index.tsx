@@ -1,27 +1,31 @@
 import {
   ValoperNonceMap,
-  getLastObservedEthNonceClient,
-  getValoperNonceMap,
+  getLastObservedEthNonceClientCached,
+  getValoperNonceMapCached,
 } from "../lib/utils";
 
 export const getStaticProps = async () => {
-  const nonce = await getLastObservedEthNonceClient({});
-  const valoperNonceMap = await getValoperNonceMap();
+  const nonce = await getLastObservedEthNonceClientCached();
+  const valoperNonceMap = await getValoperNonceMapCached();
+  const lastUpdate = new Date().toISOString();
   return {
     props: {
       nonce,
       valoperNonceMap,
+      lastUpdate,
     },
-    revalidate: 60,
+    revalidate: 10 * 60,
   };
 };
 
 const Home = ({
   nonce,
   valoperNonceMap,
+  lastUpdate,
 }: {
   nonce: number;
   valoperNonceMap: ValoperNonceMap;
+  lastUpdate: string;
 }) => (
   <main className="flex min-h-screen flex-col items-center justify-between p-24">
     <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -30,6 +34,7 @@ const Home = ({
       </div>
     </div>
     <div>
+      <p>Last Update: {new Date(lastUpdate).toLocaleString()}</p>
       <p>Last Observed Eth Nonce: {nonce}</p>
       <div>
         Valoper: orchestrator nonce:
