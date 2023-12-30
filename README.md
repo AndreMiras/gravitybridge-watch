@@ -2,7 +2,13 @@
 
 [![get-validator-info-map](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-validator-info-map.yml/badge.svg)](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-validator-info-map.yml)
 
-- <https://gravitybridge.watch>
+The Gravity Bridge Orchestrator watcher <https://gravitybridge.watch>
+
+## Endpoints:
+
+- /metrics
+- /api/get-last-observed-eth-nonce/
+- /api/get-validator-info-map/
 
 ## Getting Started
 

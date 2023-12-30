@@ -6,6 +6,14 @@ const nextConfig = {
       "/*": ["./src/proto/**", "./node_modules/@protobufs/**"],
     },
   },
+  async rewrites() {
+    return [
+      {
+        source: "/metrics",
+        destination: "/api/metrics",
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;
