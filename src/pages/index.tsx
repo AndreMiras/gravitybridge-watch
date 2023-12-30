@@ -27,17 +27,15 @@ const Home = ({
   validatorInfoMap: ValidatorInfoMap;
   lastUpdate: string;
 }) => (
-  <main className="flex min-h-screen flex-col items-center justify-between p-24">
-    <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-      <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-        Gravity Bridge Watcher
-      </div>
-    </div>
+  <main className="flex min-h-screen flex-col items-center justify-between p-10">
+    <h1 className="pb-10 text-violet-700">
+      Gravity Bridge Orchestrator Watcher
+    </h1>
     <div>
       <p>Last Update: {new Date(lastUpdate).toLocaleString()}</p>
       <p>Last Observed Eth Nonce: {nonce}</p>
-      <div>
-        Valoper: orchestrator nonce:
+      <div className="pt-5">
+        <h2 className="text-violet-500">Orchestrator nonce</h2>
         <ul className="font-mono">
           {Object.entries(validatorInfoMap).map(([valoper, info]) => (
             <li key={valoper}>
