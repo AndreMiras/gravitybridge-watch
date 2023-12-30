@@ -18,6 +18,23 @@ export const getStaticProps = async () => {
   };
 };
 
+const greenDelta = 3;
+const orangeDelta = 10;
+
+const isGreaterOrSlightlySmaller = (delta: number) => delta < greenDelta;
+
+const isModeratelySmaller = (delta: number) =>
+  delta >= greenDelta && delta < orangeDelta;
+
+const getNonceColor = (lastValue: number, value: number): string => {
+  const delta = lastValue - value;
+  return isGreaterOrSlightlySmaller(delta) || value >= lastValue
+    ? "text-green-500"
+    : isModeratelySmaller(delta)
+      ? "text-orange-500"
+      : "text-red-500";
+};
+
 const Home = ({
   nonce,
   validatorInfoMap,
@@ -45,7 +62,10 @@ const Home = ({
               >
                 {info.moniker}
               </a>
-              : {info.nonce}
+              :{" "}
+              <span className={getNonceColor(nonce, info.nonce)}>
+                {info.nonce}
+              </span>
             </li>
           ))}
         </ul>
