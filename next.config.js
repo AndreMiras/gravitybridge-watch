@@ -6,6 +6,6 @@ const nextConfig = {
       "/*": ["./src/proto/**", "./node_modules/@protobufs/**"],
     },
   },
-}
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
