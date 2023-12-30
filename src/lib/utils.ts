@@ -94,8 +94,13 @@ const getDefaultCacheClient = () => {
 };
 
 const lastEventNonceByAddrClient = async (orchestratorAddress: string) =>
-  (await lastEventNonceByAddr(getRpcClient())({ address: orchestratorAddress }))
-    .event_nonce;
+  Number(
+    (
+      await lastEventNonceByAddr(getRpcClient())({
+        address: orchestratorAddress,
+      })
+    ).event_nonce,
+  );
 
 const lastValsetRequestsClient = () => lastValsetRequests(getRpcClient())({});
 
