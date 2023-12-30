@@ -17,6 +17,7 @@ const handler = async (
     getDefaultCacheClient(),
     cacheTimeoutSeconds,
     forceUpdate,
+    "getValoperNonceMap",
   );
   const valoperNonceMap = await getValoperNonceMapCached();
   res.status(200).json(valoperNonceMap);

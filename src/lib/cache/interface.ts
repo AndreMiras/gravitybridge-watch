@@ -39,12 +39,12 @@ const getClient = (
   get: (key) => getImpl(key, config),
 });
 
-const getCacheKey = (func: Function, args: any[]): string => {
+const getCacheKey = (functionName: string, args: any[]): string => {
   let keyArgs = JSON.stringify(args);
-  if (`cache-${func.name}-${keyArgs}`.length > 1024) {
+  if (`cache-${functionName}-${keyArgs}`.length > 1024) {
     keyArgs = createHash("sha256").update(keyArgs).digest("hex");
   }
-  return `cache-${func.name}-${keyArgs}`;
+  return `cache-${functionName}-${keyArgs}`;
 };
 
 /**
@@ -53,6 +53,7 @@ const getCacheKey = (func: Function, args: any[]): string => {
  * @param cacheClient An instance of CacheClient to manage cache operations.
  * @param cacheTimeoutSeconds The time in seconds after which cache entries will expire.
  * @param forceUpdate Flag to force the update of cache even if the data is already cached.
+ * @param cachePrefix Override the cache prefix that defaults to the function name.
  * @returns A function that returns cached data if available and valid, otherwise calls the original function.
  */
 const withCache =
@@ -61,9 +62,11 @@ const withCache =
     cacheClient: CacheClient,
     cacheTimeoutSeconds: number,
     forceUpdate: boolean = false,
+    cachePrefix?: string,
   ): ((...args: any[]) => Promise<T>) =>
   async (...args: any[]): Promise<T> => {
-    const cacheKey = getCacheKey(func, args);
+    const functionName = cachePrefix || func.name;
+    const cacheKey = getCacheKey(functionName, args);
     if (!forceUpdate) {
       try {
         return await cacheClient.get(cacheKey);

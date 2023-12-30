@@ -53,6 +53,8 @@ const getLastObservedEthNonceClientCached = withCache(
   getLastObservedEthNonceClient,
   getDefaultCacheClient(),
   cacheTimeoutSeconds,
+  false,
+  "getLastObservedEthNonceClient",
 );
 
 const getDelegateKeyByEthClient = (ethAddress: string) =>
@@ -83,7 +85,11 @@ const getEthValoperMap = async (): Promise<GetDelegateKeyByEthsResponse> => {
   const validatorEthAddresses = lastValset.valsets[0].members.map(
     ({ ethereum_address: ethAddr }: { ethereum_address: string }) => ethAddr,
   );
-  return getDelegateKeyByEths(validatorEthAddresses);
+  // sort it so (if we do cache) caching keys match when the validator set is the same
+  const validatorEthAddressesSorted = [...validatorEthAddresses].sort((a, b) =>
+    a.localeCompare(b),
+  );
+  return getDelegateKeyByEths(validatorEthAddressesSorted);
 };
 
 const getValoperNonceMap = async (): Promise<ValoperNonceMap> => {
@@ -103,6 +109,8 @@ const getValoperNonceMapCached = withCache(
   getValoperNonceMap,
   getDefaultCacheClient(),
   cacheTimeoutSeconds,
+  false,
+  "getValoperNonceMap",
 );
 
 export type { GetDelegateKeyByEthsResponse, ValoperNonceMap };

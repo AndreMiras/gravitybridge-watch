@@ -24,8 +24,13 @@ interface LastValsetRequestsResponse {
   valsets: Valset[];
 }
 
-interface lastEventNonceByAddrResponse {
+interface LastEventNonceByAddrResponse {
   event_nonce: string;
+}
+
+interface GetDelegateKeyByEthResponse {
+  validator_address: string;
+  orchestrator_address: string;
 }
 
 const options = {
@@ -50,7 +55,7 @@ const getClient = (url: string) => {
 
 const lastEventNonceByAddr = (
   client: any,
-): ((params: { address: string }) => Promise<lastEventNonceByAddrResponse>) =>
+): ((params: { address: string }) => Promise<LastEventNonceByAddrResponse>) =>
   promisify(client.LastEventNonceByAddr).bind(client);
 
 const getLastObservedEthNonce = (client: any) =>
@@ -61,10 +66,18 @@ const lastValsetRequests = (
 ): ((params: {}) => Promise<LastValsetRequestsResponse>) =>
   promisify(client.LastValsetRequests).bind(client);
 
-const getDelegateKeyByEth = (client: any) =>
+const getDelegateKeyByEth = (
+  client: any,
+): ((params: {
+  eth_address: string;
+}) => Promise<GetDelegateKeyByEthResponse>) =>
   promisify(client.GetDelegateKeyByEth).bind(client);
 
-export type { LastValsetRequestsResponse, lastEventNonceByAddrResponse };
+export type {
+  LastValsetRequestsResponse,
+  LastEventNonceByAddrResponse,
+  GetDelegateKeyByEthResponse,
+};
 export {
   getClient,
   lastEventNonceByAddr,
