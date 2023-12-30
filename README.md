@@ -1,6 +1,6 @@
 # Gravity Bridge Watch
 
-[![get-valoper-nonce-map](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-valoper-nonce-map.yml/badge.svg)](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-valoper-nonce-map.yml)
+[![get-validator-info-map](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-validator-info-map.yml/badge.svg)](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-validator-info-map.yml)
 
 - <https://gravitybridge.watch>
 
