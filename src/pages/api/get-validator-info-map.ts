@@ -7,10 +7,6 @@ import {
   cacheTimeoutSeconds,
 } from "../../lib/utils";
 
-// Most of the time 15 seconds is enough to rebuild the cache.
-// This is a pro plan feature, hobby maxDuration is 10 seconds.
-export const maxDuration = 60;
-
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ValidatorInfoMap>,
