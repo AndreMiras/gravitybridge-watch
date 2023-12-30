@@ -12,19 +12,75 @@ import {
 } from "./cache/interface";
 import { getFunction, setFunction } from "./cache/gcp-bucket";
 
-interface GetDelegateKeyByEthsResponse {
-  [ethAddress: string]: {
-    validatorAddress: string;
-    orchestratorAddress: string;
-  };
+interface ArrayToObjectItem {
+  [key: string]: any;
 }
 
-interface ValoperNonceMap {
-  [valoperAddress: string]: number;
+interface CosmosValidatorDescription {
+  moniker: string;
+  identity: string;
+  website: string;
+  details: string;
+}
+
+interface CosmosValidatorCommissionRate {
+  rate: string;
+  max_rate: string;
+  max_change_rate: string;
+}
+
+interface CosmosValidatorCommission {
+  commission_rates: CosmosValidatorCommissionRate;
+  update_time: string;
+}
+
+interface CosmosValidatorPubKey {
+  "@type": string;
+  key: string;
+}
+
+interface CosmosValidator {
+  operator_address: string;
+  consensus_pubkey: CosmosValidatorPubKey;
+  jailed: boolean;
+  status: number;
+  tokens: string;
+  delegator_shares: string;
+  description: CosmosValidatorDescription;
+  unbonding_height: string;
+  unbonding_time: string;
+  commission: CosmosValidatorCommission;
+  min_self_delegation: string;
+}
+
+interface ValidatorInfoBase {
+  validatorAddress: string;
+  orchestratorAddress: string;
+}
+
+interface GetDelegateKeyByEthsResponse {
+  [ethAddress: string]: ValidatorInfoBase;
+}
+
+interface ValidatorInfo extends ValidatorInfoBase {
+  moniker: string;
+  nonce: number;
+}
+
+interface ValidatorInfoMap {
+  [valoperAddress: string]: ValidatorInfo;
 }
 
 // to avoid cache miss during ISR build, `forceUpdate` the cache before the timeout
 const cacheTimeoutSeconds = 10 * 60;
+
+const handleHttpError = (response: Response) => {
+  if (!response.ok) {
+    const errorMessage = `${response.status} ${response.statusText}`;
+    console.error(errorMessage);
+    throw new Error(errorMessage);
+  }
+};
 
 const getRpcClient = () => getClient(process.env.GRPC_SERVER!);
 
@@ -37,8 +93,9 @@ const getDefaultCacheClient = () => {
   return getCacheClient(getFunction, setFunction, config);
 };
 
-const lastEventNonceByAddrClient = (orchestratorAddress: string) =>
-  lastEventNonceByAddr(getRpcClient())({ address: orchestratorAddress });
+const lastEventNonceByAddrClient = async (orchestratorAddress: string) =>
+  (await lastEventNonceByAddr(getRpcClient())({ address: orchestratorAddress }))
+    .event_nonce;
 
 const lastValsetRequestsClient = () => lastValsetRequests(getRpcClient())({});
 
@@ -61,6 +118,40 @@ const getDelegateKeyByEthClient = (ethAddress: string) =>
   getDelegateKeyByEth(getRpcClient())({
     eth_address: ethAddress,
   });
+
+/**
+ * Fetches validators metadata (moniker, consensus pubkey, operator address...).
+ */
+const fetchValidators = async (restUrl: string, paginationOffset = 0) => {
+  const params = new URLSearchParams({
+    "pagination.offset": paginationOffset.toString(),
+  });
+  const url = `${restUrl}/cosmos/staking/v1beta1/validators?${params.toString()}`;
+  const response = await fetch(url);
+  handleHttpError(response);
+  const { validators } = await response.json();
+  return validators;
+};
+
+const fetchAllValidators = async (
+  restUrl: string,
+): Promise<CosmosValidator[]> => {
+  let allValidators: CosmosValidator[] = [];
+  let validators = [];
+  do {
+    validators = await fetchValidators(restUrl, allValidators.length);
+    allValidators = [...allValidators, ...validators];
+  } while (validators.length > 0);
+  return allValidators;
+};
+
+const fetchAllValidatorsCached = withCache(
+  fetchAllValidators,
+  getDefaultCacheClient(),
+  cacheTimeoutSeconds,
+  false,
+  "fetchAllValidators",
+);
 
 const getDelegateKeyByEths = async (
   validatorEthAddresses: string[],
@@ -92,28 +183,67 @@ const getEthValoperMap = async (): Promise<GetDelegateKeyByEthsResponse> => {
   return getDelegateKeyByEths(validatorEthAddressesSorted);
 };
 
-const getValoperNonceMap = async (): Promise<ValoperNonceMap> => {
+/**
+ * Converts an array of objects into an object using a specified key from each array item.
+ * Each array item becomes a property of the resulting object, with the property key being
+ * the value from the specified keyField in the item, and the value being the item itself minus the keyField.
+ *
+ * @param array - The array to convert.
+ * @param keyField - The field within each array item to use as the key for the resulting object.
+ * @returns An object with keys derived from the keyField of each array item and values as the corresponding items.
+ */
+const convertArrayToObject = (
+  array: ArrayToObjectItem[],
+  keyField: string,
+): Record<string, ArrayToObjectItem> =>
+  array.reduce(
+    (acc: Record<string, ArrayToObjectItem>, item: ArrayToObjectItem) => {
+      const key = item[keyField];
+      const { [keyField]: _, ...rest } = item;
+      acc[key] = rest;
+      return acc;
+    },
+    {},
+  );
+
+const getValidatorInfoMap = async (): Promise<ValidatorInfoMap> => {
   const client = getRpcClient();
   const ethValoperMap = await getEthValoperMap();
-  const valoperNonceMap = await Promise.all(
-    Object.entries(ethValoperMap).map(async ([ethAddress, valoperAddress]) => ({
-      [valoperAddress.validatorAddress]: (
-        await lastEventNonceByAddrClient(valoperAddress.orchestratorAddress)
-      ).event_nonce,
-    })),
+  const allValidators = await fetchAllValidatorsCached(
+    process.env.REST_SERVER!,
   );
-  return Object.assign({}, ...valoperNonceMap);
+  const validatorsByAddress = convertArrayToObject(
+    allValidators,
+    "operator_address",
+  );
+  const validatorInfoMap = await Promise.all(
+    Object.entries(ethValoperMap).map(async ([ethAddress, validatorInfo]) => {
+      const moniker =
+        await validatorsByAddress[validatorInfo.validatorAddress].description
+          .moniker;
+      const nonce = await lastEventNonceByAddrClient(
+        validatorInfo.orchestratorAddress,
+      );
+      return {
+        [validatorInfo.validatorAddress]: {
+          ...validatorInfo,
+          ...{ nonce, moniker },
+        },
+      };
+    }),
+  );
+  return Object.assign({}, ...validatorInfoMap);
 };
 
-const getValoperNonceMapCached = withCache(
-  getValoperNonceMap,
+const getValidatorInfoMapCached = withCache(
+  getValidatorInfoMap,
   getDefaultCacheClient(),
   cacheTimeoutSeconds,
   false,
-  "getValoperNonceMap",
+  "getValidatorInfoMap",
 );
 
-export type { GetDelegateKeyByEthsResponse, ValoperNonceMap };
+export type { GetDelegateKeyByEthsResponse, ValidatorInfoMap };
 export {
   cacheTimeoutSeconds,
   getRpcClient,
@@ -122,6 +252,6 @@ export {
   getLastObservedEthNonceClientCached,
   getDelegateKeyByEths,
   getEthValoperMap,
-  getValoperNonceMap,
-  getValoperNonceMapCached,
+  getValidatorInfoMap,
+  getValidatorInfoMapCached,
 };

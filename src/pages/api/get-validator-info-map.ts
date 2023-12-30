@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { withCache } from "../../lib/cache/interface";
 import {
-  ValoperNonceMap,
-  getValoperNonceMap,
+  ValidatorInfoMap,
+  getValidatorInfoMap,
   getDefaultCacheClient,
   cacheTimeoutSeconds,
 } from "../../lib/utils";
@@ -13,18 +13,18 @@ export const maxDuration = 60;
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ValoperNonceMap>,
+  res: NextApiResponse<ValidatorInfoMap>,
 ) => {
   const forceUpdate = req.query.forceUpdate === "true";
-  const getValoperNonceMapCached = withCache(
-    getValoperNonceMap,
+  const getValidatorInfoMapCached = withCache(
+    getValidatorInfoMap,
     getDefaultCacheClient(),
     cacheTimeoutSeconds,
     forceUpdate,
-    "getValoperNonceMap",
+    "getValidatorInfoMap",
   );
-  const valoperNonceMap = await getValoperNonceMapCached();
-  res.status(200).json(valoperNonceMap);
+  const validatorInfoMap = await getValidatorInfoMapCached();
+  res.status(200).json(validatorInfoMap);
 };
 
 export default handler;

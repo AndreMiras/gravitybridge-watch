@@ -1,17 +1,17 @@
 import {
-  ValoperNonceMap,
+  ValidatorInfoMap,
   getLastObservedEthNonceClientCached,
-  getValoperNonceMapCached,
+  getValidatorInfoMapCached,
 } from "../lib/utils";
 
 export const getStaticProps = async () => {
   const nonce = await getLastObservedEthNonceClientCached();
-  const valoperNonceMap = await getValoperNonceMapCached();
+  const validatorInfoMap = await getValidatorInfoMapCached();
   const lastUpdate = new Date().toISOString();
   return {
     props: {
       nonce,
-      valoperNonceMap,
+      validatorInfoMap,
       lastUpdate,
     },
     revalidate: 10 * 60,
@@ -20,11 +20,11 @@ export const getStaticProps = async () => {
 
 const Home = ({
   nonce,
-  valoperNonceMap,
+  validatorInfoMap,
   lastUpdate,
 }: {
   nonce: number;
-  valoperNonceMap: ValoperNonceMap;
+  validatorInfoMap: ValidatorInfoMap;
   lastUpdate: string;
 }) => (
   <main className="flex min-h-screen flex-col items-center justify-between p-24">
@@ -39,9 +39,15 @@ const Home = ({
       <div>
         Valoper: orchestrator nonce:
         <ul className="font-mono">
-          {Object.entries(valoperNonceMap).map(([valoper, nonce]) => (
+          {Object.entries(validatorInfoMap).map(([valoper, info]) => (
             <li key={valoper}>
-              {valoper}: {nonce}
+              <a
+                href={`https://www.mintscan.io/gravity-bridge/validators/${valoper}`}
+                className="hover:text-violet-700"
+              >
+                {info.moniker}
+              </a>
+              : {info.nonce}
             </li>
           ))}
         </ul>
