@@ -10,3 +10,9 @@ data "google_secret_manager_secret_version" "cloudflare_api_token" {
   version    = "latest"
   depends_on = [google_project_service.secretmanager]
 }
+
+# https://grafana.com/docs/grafana/latest/setup-grafana/configure-grafana/#admin_password
+data "google_secret_manager_secret" "grafana_admin_password" {
+  secret_id  = "${var.service_name}-grafana-admin-password"
+  depends_on = [google_project_service.secretmanager]
+}

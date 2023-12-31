@@ -53,10 +53,21 @@ variable "prometheus_image" {
   default = "prometheus"
 }
 
+variable "grafana_image" {
+  type    = string
+  default = "grafana"
+}
+
 variable "prometheus_vm_tags" {
   description = "Additional network tags for the VM."
   type        = list(string)
   default     = ["prometheus", "http-server"]
+}
+
+variable "grafana_vm_tags" {
+  description = "Additional network tags for the VM."
+  type        = list(string)
+  default     = ["https-server"]
 }
 
 variable "prometheus_port" {
@@ -108,10 +119,17 @@ variable "prometheus_domain_prefix" {
   default = "prometheus"
 }
 
+variable "grafana_domain_prefix" {
+  type    = string
+  default = "grafana"
+}
+
 locals {
   docker_registry        = "gcr.io/${var.project}"
   prometheus_image       = "${local.docker_registry}/${var.prometheus_image}:${var.image_tag}"
+  grafana_image          = "${local.docker_registry}/${var.grafana_image}:${var.image_tag}"
   prometheus_domain_name = "${var.prometheus_domain_prefix}.${var.domain_suffix}"
+  grafana_domain_name    = "${var.grafana_domain_prefix}.${var.domain_suffix}"
   volume_mounts = [
     {
       mountPath = var.prometheus_container_datadir_path

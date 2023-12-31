@@ -7,8 +7,8 @@
     "dev:debug": "NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
-    "lint:prettier": "prettier --check src .github *.{js,ts} *.md",
-    "format:prettier": "prettier --write src .github *.{js,ts} *.md",
+    "lint:prettier": "prettier --check src .github docker *.{js,ts} *.md",
+    "format:prettier": "prettier --write src .github docker *.{js,ts} *.md",
     "lint": "next lint && npm run lint:prettier",
     "format": "npm run format:prettier"
   },

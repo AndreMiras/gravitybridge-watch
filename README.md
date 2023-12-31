@@ -4,11 +4,14 @@
 
 The Gravity Bridge Orchestrator watcher <https://gravitybridge.watch>
 
-## Endpoints:
+## Services & Endpoints
 
-- /metrics
-- /api/get-last-observed-eth-nonce/
-- /api/get-validator-info-map/
+- https://gravitybridge.watch
+  - /metrics
+  - /api/get-last-observed-eth-nonce/
+  - /api/get-validator-info-map/
+- https://prometheus.gravitybridge.watch
+- https://grafana.gravitybridge.watch
 
 ## Getting Started
 
@@ -59,4 +62,12 @@ On Docker image changes, re-build the image, push it and restart the VM.
 ```sh
 make docker/login
 make docker/push
+```
+
+### Grafana
+
+On Docker image changes, re-build the image, push it and redeploy the Cloud Run service with.
+
+```sh
+make devops/gcloud/redeploy/grafana
 ```

@@ -48,6 +48,11 @@ resource "google_project_service" "container_registry" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "cloud_run_api" {
+  service            = "run.googleapis.com"
+  disable_on_destroy = false
+}
+
 data "local_file" "format_script" {
   filename = "${path.module}/format.sh"
 }
