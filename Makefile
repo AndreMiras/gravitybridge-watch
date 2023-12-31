@@ -2,6 +2,7 @@ SHELL=/bin/bash
 PROJECT=gravitybridge-watch
 REGISTRY=gcr.io/$(PROJECT)
 IMAGE_TAG=latest
+SERVICE_NAME=gbw
 PROMETHEUS_IMAGE_NAME=prometheus
 PROMETHEUS_DOCKER_IMAGE=$(REGISTRY)/$(PROMETHEUS_IMAGE_NAME)
 CLOUDSDK_CORE_ACCOUNT?=notset
@@ -42,8 +43,10 @@ devops/terraform/plan:
 devops/terraform/apply:
 	terraform -chdir=terraform/core apply -auto-approve
 
-devops/gcloud/reboot/vm/%:
-	gcloud compute instances reset $*
+devops/gcloud/reboot/vm/%: ensure-account-set
+	gcloud --project $(PROJECT) compute instances reset $*
+
+devops/gcloud/reboot/prometheus: ensure-account-set devops/gcloud/reboot/vm/$(SERVICE_NAME)-prometheus
 
 devops/terraform/output:
 	terraform -chdir=terraform/core output
