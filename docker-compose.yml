@@ -1,0 +1,11 @@
+version: "3.9"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.48.1
+    env_file:
+      - .env.local
+    volumes:
+      - ./docker/prometheus/config/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"

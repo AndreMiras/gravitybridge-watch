@@ -33,3 +33,30 @@ The Cosmos gRPC queries can be explored using grpcui, e.g.
 ```sh
 docker run -it --rm --publish 8080:8080 fullstorydev/grpcui:latest -plaintext <server>:9090
 ```
+
+## Deployments
+
+### Frontend
+
+It's managed via the Vercel built-in CI/CD, but a deployment can be triggered manually using the vercel CLI.
+
+```sh
+npx vercel
+```
+
+### Infra changes
+
+Infra changes are handled by terraform.
+
+```sh
+make devops/terraform/apply
+```
+
+### Prometheus
+
+On Docker image changes, re-build the image, push it and restart the VM.
+
+```sh
+make docker/login
+make docker/push
+```
