@@ -89,9 +89,29 @@ variable "prometheus_host_datadir_path" {
   default = "/mnt/disks/sdb"
 }
 
+## Domains setup
+
+variable "domain_suffix" {
+  type        = string
+  description = "The domain suffix used by all subdomains"
+  default     = "gravitybridge.watch"
+}
+
+variable "cloudflare_zone_id" {
+  type        = string
+  description = "The zone identifier"
+  default     = "f44415c780d436f35c214db61459f898"
+}
+
+variable "prometheus_domain_prefix" {
+  type    = string
+  default = "prometheus"
+}
+
 locals {
-  docker_registry  = "gcr.io/${var.project}"
-  prometheus_image = "${local.docker_registry}/${var.prometheus_image}:${var.image_tag}"
+  docker_registry        = "gcr.io/${var.project}"
+  prometheus_image       = "${local.docker_registry}/${var.prometheus_image}:${var.image_tag}"
+  prometheus_domain_name = "${var.prometheus_domain_prefix}.${var.domain_suffix}"
   volume_mounts = [
     {
       mountPath = var.prometheus_container_datadir_path
