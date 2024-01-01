@@ -206,7 +206,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "orchestrator_nonce",
+          "expr": "orchestrator_nonce{moniker=~\"$Moniker\", validatorAddress=~\"$Valoper\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -220,11 +220,58 @@
       "type": "timeseries"
     }
   ],
-  "refresh": false,
+  "refresh": "",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": ["All"],
+          "value": ["$__all"]
+        },
+        "definition": "label_values(moniker)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "Moniker",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(moniker)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ["All"],
+          "value": ["$__all"]
+        },
+        "definition": "label_values(validatorAddress)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "Valoper",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(validatorAddress)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-6h",
