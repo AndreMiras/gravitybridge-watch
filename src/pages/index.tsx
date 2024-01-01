@@ -45,9 +45,6 @@ const Home = ({
   lastUpdate: string;
 }) => (
   <main className="flex min-h-screen flex-col items-center justify-between p-10">
-    <h1 className="pb-10 text-violet-700">
-      Gravity Bridge Orchestrator Watcher
-    </h1>
     <div>
       <p>Last Update: {new Date(lastUpdate).toLocaleString()}</p>
       <p>Last Observed Eth Nonce: {nonce}</p>
