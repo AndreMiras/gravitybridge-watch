@@ -21,6 +21,7 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./docker/grafana/config/etc/grafana/provisioning:/etc/grafana/provisioning
+      - ./docker/grafana/config/usr/share/grafana/public/dashboards/home.json:/usr/share/grafana/public/dashboards/home.json
     ports:
       - "13000:3000"
 
