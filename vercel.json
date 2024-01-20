@@ -3,5 +3,11 @@
     "src/pages/api/**/*.ts": {
       "maxDuration": 60
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/get-validator-info-map?forceUpdate=true",
+      "schedule": "*/8 * * * *"
+    }
+  ]
 }
