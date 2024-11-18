@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   prometheus:
-    image: gcr.io/gravitybridge-watch/prometheus:latest
+    image: us-central1-docker.pkg.dev/gravitybridge-watch/gravitybridge-watch/prometheus:latest
     build:
       context: docker/prometheus
     env_file:
@@ -13,7 +13,7 @@ services:
     ports:
       - "9090:9090"
   grafana:
-    image: gcr.io/gravitybridge-watch/grafana:latest
+    image: us-central1-docker.pkg.dev/gravitybridge-watch/gravitybridge-watch/grafana:latest
     build:
       context: docker/grafana
     env_file:

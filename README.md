@@ -74,6 +74,7 @@ On Docker image changes, re-build the image, push it and restart the VM.
 ```sh
 make docker/login
 make docker/push
+make devops/gcloud/reboot/prometheus
 ```
 
 ### Grafana

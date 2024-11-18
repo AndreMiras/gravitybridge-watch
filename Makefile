@@ -1,7 +1,10 @@
 SHELL=/bin/bash
 PROJECT=gravitybridge-watch
 REGION=us-central1
-REGISTRY=gcr.io/$(PROJECT)
+REGISTRY_REGION=$(REGION)
+REGISTRY_HOSTNAME=$(REGISTRY_REGION)-docker.pkg.dev
+REGISTRY_REPOSITORY=$(PROJECT)
+REGISTRY=$(REGISTRY_HOSTNAME)/$(PROJECT)/$(REGISTRY_REPOSITORY)
 IMAGE_TAG=latest
 SERVICE_NAME=gbw
 PROMETHEUS_IMAGE_NAME=prometheus
@@ -33,13 +36,13 @@ docker/build/grafana:
 docker/build: docker/build/prometheus docker/build/grafana
 
 docker/login: ensure-account-set
-	gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://gcr.io
+	CLOUDSDK_CORE_ACCOUNT=$(CLOUDSDK_CORE_ACCOUNT) gcloud auth configure-docker $(REGISTRY_HOSTNAME)
 
 docker/push/prometheus:
-	docker push $(PROMETHEUS_DOCKER_IMAGE):$(IMAGE_TAG)
+	CLOUDSDK_CORE_ACCOUNT=$(CLOUDSDK_CORE_ACCOUNT) docker push $(PROMETHEUS_DOCKER_IMAGE):$(IMAGE_TAG)
 
 docker/push/grafana:
-	docker push $(GRAFANA_DOCKER_IMAGE):$(IMAGE_TAG)
+	CLOUDSDK_CORE_ACCOUNT=$(CLOUDSDK_CORE_ACCOUNT) docker push $(GRAFANA_DOCKER_IMAGE):$(IMAGE_TAG)
 
 docker/push: ensure-account-set docker/push/prometheus docker/push/grafana
 
@@ -54,6 +57,11 @@ devops/terraform/plan:
 
 devops/terraform/apply:
 	terraform -chdir=terraform/core apply -auto-approve
+
+devops/gcloud/ssh/vm/%:
+	CLOUDSDK_CORE_ACCOUNT=$(CLOUDSDK_CORE_ACCOUNT) gcloud --project $(PROJECT) compute ssh $*
+
+devops/gcloud/ssh/vm: devops/gcloud/ssh/vm/$(SERVICE_NAME)-prometheus
 
 devops/gcloud/reboot/vm/%: ensure-account-set
 	gcloud --project $(PROJECT) compute instances reset $*

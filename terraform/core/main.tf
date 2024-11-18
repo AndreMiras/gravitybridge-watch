@@ -48,6 +48,14 @@ resource "google_project_service" "container_registry" {
   disable_on_destroy = false
 }
 
+resource "google_artifact_registry_repository" "this" {
+  provider      = google
+  location      = var.region
+  repository_id = var.docker_repository_id
+  format        = "DOCKER"
+  description   = "Repository for the ${var.service_name} Docker images."
+}
+
 resource "google_project_service" "cloud_run_api" {
   service            = "run.googleapis.com"
   disable_on_destroy = false

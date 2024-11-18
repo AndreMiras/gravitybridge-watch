@@ -130,6 +130,19 @@ variable "grafana_domain_prefix" {
   default = "grafana"
 }
 
+## Docker
+
+variable "docker_repository_id" {
+  description = "The Docker repository ID."
+  type        = string
+  default     = "gravitybridge-watch"
+}
+
+variable "docker_image_tag" {
+  type    = string
+  default = "latest"
+}
+
 ## Cloudflare Worker
 
 variable "worker_script_path" {
@@ -139,11 +152,12 @@ variable "worker_script_path" {
 }
 
 locals {
-  docker_registry        = "gcr.io/${var.project}"
-  prometheus_image       = "${local.docker_registry}/${var.prometheus_image}:${var.image_tag}"
-  grafana_image          = "${local.docker_registry}/${var.grafana_image}:${var.image_tag}"
-  prometheus_domain_name = "${var.prometheus_domain_prefix}.${var.domain_suffix}"
-  grafana_domain_name    = "${var.grafana_domain_prefix}.${var.domain_suffix}"
+  docker_registry           = "${var.region}-docker.pkg.dev/${var.project}"
+  docker_repository_id_full = "${local.docker_registry}/${var.docker_repository_id}"
+  prometheus_image          = "${local.docker_repository_id_full}/${var.prometheus_image}:${var.image_tag}"
+  grafana_image             = "${local.docker_repository_id_full}/${var.grafana_image}:${var.image_tag}"
+  prometheus_domain_name    = "${var.prometheus_domain_prefix}.${var.domain_suffix}"
+  grafana_domain_name       = "${var.grafana_domain_prefix}.${var.domain_suffix}"
   volume_mounts = [
     {
       mountPath = var.prometheus_container_datadir_path
