@@ -74,13 +74,9 @@ module "gce_prometheus_worker_container" {
   region = var.region
   zone   = var.zone
   image  = local.prometheus_image
-  custom_command = [
-    "/entrypoint.sh",
-  ]
   # overwrite `storage.tsdb.path` and `storage.tsdb.retention.time` from default args:
   # https://github.com/prometheus/prometheus/blob/v2.48.1/Dockerfile#L25-L28
   custom_args = [
-    "/bin/prometheus",
     "--config.file",
     "/etc/prometheus/prometheus.yml",
     "--storage.tsdb.path",
