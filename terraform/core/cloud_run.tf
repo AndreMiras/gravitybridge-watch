@@ -58,17 +58,3 @@ resource "google_cloud_run_v2_service_iam_policy" "grafana_noauth" {
   name        = google_cloud_run_v2_service.grafana.name
   policy_data = data.google_iam_policy.noauth.policy_data
 }
-
-resource "google_cloud_run_domain_mapping" "grafana" {
-  location = var.region
-  name     = local.grafana_domain_name
-  metadata {
-    namespace = var.project
-    labels = {
-      service_name = var.service_name
-    }
-  }
-  spec {
-    route_name = google_cloud_run_v2_service.grafana.name
-  }
-}

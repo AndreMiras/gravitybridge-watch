@@ -114,6 +114,12 @@ variable "cloudflare_zone_id" {
   default     = "f44415c780d436f35c214db61459f898"
 }
 
+variable "cloudflare_account_id" {
+  description = "The Cloudflare account ID"
+  type        = string
+  default     = "22b053e95a0d5fcaf55dbb945539d853"
+}
+
 variable "prometheus_domain_prefix" {
   type    = string
   default = "prometheus"
@@ -122,6 +128,14 @@ variable "prometheus_domain_prefix" {
 variable "grafana_domain_prefix" {
   type    = string
   default = "grafana"
+}
+
+## Cloudflare Worker
+
+variable "worker_script_path" {
+  description = "The path of the Cloudflare Worker script."
+  type        = string
+  default     = "../../build/cloudflare_reverse_proxy_worker.js"
 }
 
 locals {

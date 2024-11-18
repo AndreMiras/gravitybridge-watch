@@ -33,14 +33,6 @@ resource "cloudflare_page_rule" "prometheus" {
   }
 }
 
-resource "cloudflare_record" "grafana" {
-  name    = var.grafana_domain_prefix
-  zone_id = var.cloudflare_zone_id
-  value   = "ghs.googlehosted.com"
-  type    = "CNAME"
-  proxied = true
-}
-
 # Enable end to end SSL encryption for Grafana as it's running in Cloud Run
 resource "cloudflare_page_rule" "grafana" {
   zone_id  = var.cloudflare_zone_id
@@ -49,4 +41,30 @@ resource "cloudflare_page_rule" "grafana" {
   actions {
     ssl = "strict"
   }
+}
+
+# Reverse proxy worker
+
+resource "cloudflare_worker_script" "grafana_reverse_proxy" {
+  account_id = var.cloudflare_account_id
+  name       = "grafana-reverse-proxy"
+  content    = file(var.worker_script_path)
+  module     = true
+  plain_text_binding {
+    name = "PROXY_PASS_URL"
+    text = google_cloud_run_v2_service.grafana.uri
+  }
+}
+
+resource "cloudflare_worker_domain" "grafana_reverse_proxy" {
+  account_id = var.cloudflare_account_id
+  zone_id    = var.cloudflare_zone_id
+  hostname   = local.grafana_domain_name
+  service    = cloudflare_worker_script.grafana_reverse_proxy.name
+}
+
+resource "cloudflare_worker_route" "grafana_reverse_proxy" {
+  zone_id     = var.cloudflare_zone_id
+  pattern     = "${cloudflare_worker_domain.grafana_reverse_proxy.hostname}/*"
+  script_name = cloudflare_worker_script.grafana_reverse_proxy.name
 }

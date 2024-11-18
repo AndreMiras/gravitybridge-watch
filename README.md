@@ -55,6 +55,18 @@ Infra changes are handled by terraform.
 make devops/terraform/apply
 ```
 
+### Cloudflare worker
+
+We're leveraging a Cloudflare worker for the Grafana reverse proxy.
+This is just used to map our custom domain to the Cloud Run service.
+Build it with:
+
+```sh
+npm run build:wrangler
+```
+
+And then deploy the Terraform changes a usual.
+
 ### Prometheus
 
 On Docker image changes, re-build the image, push it and restart the VM.
