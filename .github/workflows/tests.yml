@@ -1,0 +1,23 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - run: npx tsc
+      - run: npm run build
+        env:
+          GCP_CLIENT_EMAIL: ${{ secrets.GCP_CLIENT_EMAIL }}
+          GCP_PRIVATE_KEY: ${{ secrets.GCP_PRIVATE_KEY }}
+          GCP_BUCKET: ${{ vars.GCP_BUCKET }}
+      - run: make lint

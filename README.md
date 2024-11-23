@@ -1,5 +1,6 @@
 # Gravity Bridge Watch
 
+[![Tests](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/tests.yml/badge.svg)](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/tests.yml)
 [![get-validator-info-map](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-validator-info-map.yml/badge.svg)](https://github.com/AndreMiras/gravitybridge-watch/actions/workflows/get-validator-info-map.yml)
 
 The Gravity Bridge Orchestrator watcher <https://gravitybridge.watch>
