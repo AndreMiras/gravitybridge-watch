@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^7.7.0",
-    "@grpc/grpc-js": "^1.9.13",
+    "@grpc/grpc-js": "^1.9.15",
     "@protobufs/osmosis": "^0.4.0",
     "next": "14.2.10",
     "prom-client": "^15.1.0",
