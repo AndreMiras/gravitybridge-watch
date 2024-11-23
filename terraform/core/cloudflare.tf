@@ -18,7 +18,7 @@ resource "cloudflare_page_rule" "acme_challenge_bypass" {
 resource "cloudflare_record" "prometheus" {
   name    = var.prometheus_domain_prefix
   zone_id = var.cloudflare_zone_id
-  value   = module.gce_prometheus_worker_container.google_compute_instance_ip
+  content = module.gce_prometheus_worker_container.google_compute_instance_ip
   type    = "A"
   proxied = true
 }
@@ -45,7 +45,7 @@ resource "cloudflare_page_rule" "grafana" {
 
 # Reverse proxy worker
 
-resource "cloudflare_worker_script" "grafana_reverse_proxy" {
+resource "cloudflare_workers_script" "grafana_reverse_proxy" {
   account_id = var.cloudflare_account_id
   name       = "grafana-reverse-proxy"
   content    = file(var.worker_script_path)
@@ -56,15 +56,15 @@ resource "cloudflare_worker_script" "grafana_reverse_proxy" {
   }
 }
 
-resource "cloudflare_worker_domain" "grafana_reverse_proxy" {
+resource "cloudflare_workers_domain" "grafana_reverse_proxy" {
   account_id = var.cloudflare_account_id
   zone_id    = var.cloudflare_zone_id
   hostname   = local.grafana_domain_name
-  service    = cloudflare_worker_script.grafana_reverse_proxy.name
+  service    = cloudflare_workers_script.grafana_reverse_proxy.name
 }
 
-resource "cloudflare_worker_route" "grafana_reverse_proxy" {
+resource "cloudflare_workers_route" "grafana_reverse_proxy" {
   zone_id     = var.cloudflare_zone_id
-  pattern     = "${cloudflare_worker_domain.grafana_reverse_proxy.hostname}/*"
-  script_name = cloudflare_worker_script.grafana_reverse_proxy.name
+  pattern     = "${cloudflare_workers_domain.grafana_reverse_proxy.hostname}/*"
+  script_name = cloudflare_workers_script.grafana_reverse_proxy.name
 }
