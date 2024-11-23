@@ -7,6 +7,10 @@ const Header = (): JSX.Element => (
       <Link href="/">Gravity Bridge Orchestrator Watcher</Link>
     </h1>
     <nav>
+      <HeaderLink
+        url="https://github.com/AndreMiras/gravitybridge-watch"
+        text="About"
+      />
       <HeaderLink url="https://grafana.gravitybridge.watch" text="Grafana" />
       <HeaderLink url="/metrics" text="/metrics" />
       <HeaderLink
