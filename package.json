@@ -17,7 +17,7 @@
     "@google-cloud/storage": "^7.7.0",
     "@grpc/grpc-js": "^1.9.15",
     "@protobufs/osmosis": "^0.4.0",
-    "next": "14.2.10",
+    "next": "14.2.25",
     "prom-client": "^15.1.0",
     "react": "^18",
     "react-dom": "^18"
