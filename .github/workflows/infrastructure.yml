@@ -34,6 +34,9 @@ jobs:
       # Checks that all Terraform configuration files adhere to a canonical format
       - run: make lint/terraform
       - run: make devops/terraform/init
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - run: npm ci
       - run: npm run build:wrangler
       - run: make devops/terraform/plan
