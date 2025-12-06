@@ -20,5 +20,6 @@ jobs:
           GCP_CLIENT_EMAIL: ${{ secrets.GCP_CLIENT_EMAIL }}
           GCP_PRIVATE_KEY: ${{ secrets.GCP_PRIVATE_KEY }}
           GCP_BUCKET: ${{ vars.GCP_BUCKET }}
+      - run: npm run test:run
       - uses: hashicorp/setup-terraform@v3
       - run: make lint

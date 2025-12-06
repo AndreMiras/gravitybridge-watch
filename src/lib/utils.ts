@@ -259,4 +259,6 @@ export {
   getEthValoperMap,
   getValidatorInfoMap,
   getValidatorInfoMapCached,
+  convertArrayToObject,
+  handleHttpError,
 };

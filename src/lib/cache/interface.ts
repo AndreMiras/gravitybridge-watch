@@ -82,4 +82,4 @@ const withCache =
   };
 
 export type { CacheConfig, GetFunction, SetFunction, CacheClient };
-export { CacheMissError, getClient, withCache };
+export { CacheMissError, getClient, withCache, getCacheKey };
