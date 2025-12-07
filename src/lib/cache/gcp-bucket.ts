@@ -32,8 +32,8 @@ const getFunction: GetFunction = async (key, config) => {
     }
     const data = await file.download();
     return JSON.parse(data.toString());
-  } catch (error: any) {
-    if (error.code === 404) {
+  } catch (error: unknown) {
+    if (error instanceof Error && "code" in error && error.code === 404) {
       throw new CacheMissError(`Key not found: ${key}`);
     }
     throw error;

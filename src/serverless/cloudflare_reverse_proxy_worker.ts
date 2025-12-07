@@ -24,7 +24,7 @@ const handleFetch = async (
   const targetUrl = new URL(url.pathname + url.search, env.PROXY_PASS_URL);
   const response = await fetch(targetUrl, {
     method: request.method,
-    headers: request.headers as any,
+    headers: request.headers as unknown as HeadersInit,
     body: request.body as unknown as BodyInit,
   });
   // workaround for the mismatching Cloudflare Request/Response/fetch vs Node implementation

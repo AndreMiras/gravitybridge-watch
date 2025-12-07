@@ -104,7 +104,7 @@ const lastEventNonceByAddrClient = async (orchestratorAddress: string) =>
 
 const lastValsetRequestsClient = () => lastValsetRequests(getRpcClient())({});
 
-const getLastObservedEthNonceClient = async (client: any) => {
+const getLastObservedEthNonceClient = async () => {
   const { nonce: nonceString } = await getLastObservedEthNonce(getRpcClient())(
     {},
   );
