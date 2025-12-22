@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "@google-cloud/storage": "^7.7.0",
-    "@grpc/grpc-js": "^1.9.15",
+    "@grpc/grpc-js": "^1.14.3",
     "@protobufs/osmosis": "^0.4.0",
     "next": "^16.1.0",
     "prom-client": "^15.1.0",
