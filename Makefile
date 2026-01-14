@@ -53,7 +53,7 @@ devops/terraform/init:
 	terraform -chdir=terraform/core init
 
 devops/terraform/plan:
-	terraform -chdir=terraform/core plan
+	terraform -chdir=terraform/core plan -lock-timeout=60s
 
 devops/terraform/apply:
 	terraform -chdir=terraform/core apply -auto-approve
